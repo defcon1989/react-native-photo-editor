@@ -27,12 +27,23 @@ RCTResponseSenderBlock _onCancelEditing = nil;
         path = url.path;
     }
 
-    [isPNG ? UIImagePNGRepresentation(image) : UIImageJPEGRepresentation(image, 0.8) writeToFile:path options:NSDataWritingAtomic error:&error];
-
+    NSString *newImagePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES) firstObject];
+    NSString *fileName = [[_editImagePath componentsSeparatedByString:@"/"].lastObject componentsSeparatedByString:@"."].firstObject;
+	
+    if (isPNG) {
+	fileName = [fileName stringByAppendingString:@".png"];
+	newImagePath = [newImagePath stringByAppendingPathComponent:fileName];
+	[UIImagePNGRepresentation(image) writeToFile:newImagePath options:NSDataWritingAtomic error:&error];
+    }else{
+	fileName = [fileName stringByAppendingString:@".jpg"];
+	newImagePath = [newImagePath stringByAppendingPathComponent:fileName];
+	[UIImageJPEGRepresentation(image, 0.8) writeToFile:newImagePath options:NSDataWritingAtomic error:&error];   
+    }
+	
     if (error != nil)
         NSLog(@"write error %@", error); 
    
-    _onDoneEditing(@[]);
+    _onDoneEditing(@[newImagePath]);
 }
 
 - (void)canceledEditing {
